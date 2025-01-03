@@ -22,6 +22,13 @@
     </div>
 
     <script>
+        // Function to fetch JSON data
+        async function fetchConfig() {
+            const response = await fetch('chatbot.json.json');
+            const config = await response.json();
+            return config;
+        }
+
         async function sendMessage() {
             const messageInput = document.getElementById('messageInput');
             const messages = document.getElementById('messages');
@@ -30,19 +37,23 @@
             // Add user message to chat
             messages.innerHTML += `<div><strong>You:</strong> ${userMessage}</div>`;
 
-            // Send message to chatbot API
-            const response = await fetch('https://your-api-url/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMessage })
-            });
-            const data = await response.json();
+            // Fetch JSON config
+            const config = await fetchConfig();
 
-            // Add chatbot response to chat
-            messages.innerHTML += `<div><strong>Bot:</strong> ${data.response}</div>`;
+            // Mock response from chatbot based on JSON config
+            const botResponse = config.responses[userMessage.toLowerCase()] || "I don't understand that.";
+            messages.innerHTML += `<div><strong>Bot:</strong> ${botResponse}</div>`;
+
             messageInput.value = '';
             messages.scrollTop = messages.scrollHeight;
         }
+
+        // Display welcome message from JSON config on page load
+        window.onload = async () => {
+            const messages = document.getElementById('messages');
+            const config = await fetchConfig();
+            messages.innerHTML += `<div><strong>Bot:</strong> ${config.welcome_message}</div>`;
+        };
     </script>
 </body>
 </html>
